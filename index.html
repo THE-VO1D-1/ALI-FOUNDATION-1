@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Beacon - Ali Foundation Indore</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        beacon: { gold: '#D4AF37', dark: '#1A1A24', light: '#F8F9FA' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-beacon-light text-gray-800 min-h-screen font-sans pb-20">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center relative">
+            <div class="flex items-center gap-2">
+                <h1 class="text-xl font-bold tracking-wide text-beacon-dark">THE BEACON</h1>
+                <span class="text-[10px] bg-beacon-gold/20 text-yellow-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Live</span>
+            </div>
+            <button id="top-menu-btn" class="text-gray-600 p-2 -mr-2 focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+            
+            <div id="top-menu-dropdown" class="hidden absolute top-full right-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden z-50">
+                <div class="p-5 border-b border-gray-50 bg-gray-50/50">
+                    <p class="text-sm font-bold text-gray-800">My Profile</p>
+                    <p id="reputation-display" class="text-xs text-beacon-gold font-bold mt-1 tracking-wide">⭐ 0 Reputation Points</p>
+                </div>
+                <div class="py-2">
+                    <button id="nav-ngo-dashboard" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        NGO Dashboard
+                    </button>
+                    <button id="nav-my-impact" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        My Impact & Inbox
+                    </button>
+                    <button id="nav-leaderboard" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        Leaderboard
+                    </button>
+                    <button id="nav-mission" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        Our Mission
+                    </button>
+                    <button onclick="auth.signOut().then(() => location.reload())" class="w-full text-left px-5 py-3 text-sm text-red-500 border-t border-gray-50 mt-2 flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="profile-setup" class="max-w-md mx-auto p-6 mt-4 text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Ali Foundation</h2>
+        <p class="text-sm text-gray-500 mb-8 italic">Building a legacy for the forgotten.</p>
+        <button onclick="signInWithGoogle()" class="w-full bg-white text-gray-700 font-bold py-4 rounded-2xl shadow-md border border-gray-200 flex items-center justify-center gap-3 active:scale-95 transition-transform">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa_g_logo.png" class="w-5 h-5">
+            Sign in with Google
+        </button>
+    </div>
+
+    <main id="main-app" class="hidden max-w-md mx-auto p-6 mt-4">
+        <h2 class="text-2xl font-bold mb-6 text-beacon-dark">Report a Need</h2>
+        <form id="beacon-form" class="space-y-6">
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-3">1. Photo Evidence</label>
+                <input type="file" id="media-upload" accept="image/*" capture="environment" class="hidden">
+                <button type="button" onclick="document.getElementById('media-upload').click()" class="w-full border-2 border-dashed border-gray-200 rounded-xl p-6 text-center text-sm font-bold text-gray-500">
+                    Tap to Capture Photo
+                </button>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-3">2. Exact Location</label>
+                <button type="button" id="get-location-btn" class="w-full bg-gray-50 text-gray-700 font-bold py-3 rounded-xl">Auto-Detect Pin</button>
+                <input type="hidden" id="latitude">
+                <input type="hidden" id="longitude">
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-3">3. Details</label>
+                <textarea id="description" rows="3" placeholder="Describe the situation..." class="w-full p-3 bg-gray-50 outline-none rounded-lg resize-none"></textarea>
+            </div>
+            <button type="submit" id="submit-btn" class="w-full bg-beacon-dark text-white font-bold py-4 rounded-xl shadow-lg">Light The Beacon</button>
+        </form>
+        <div id="success-message" class="hidden text-center py-10">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Beacon Activated</h3>
+            <button onclick="location.reload()" class="mt-4 text-beacon-gold font-bold">New Report</button>
+        </div>
+    </main>
+
+    <div id="helper-dashboard" class="hidden max-w-md mx-auto p-6 mt-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Active Beacons</h2>
+            <button class="back-btn text-xs font-bold text-beacon-gold uppercase">← Back</button>
+        </div>
+        <div id="active-cases-container" class="space-y-4"></div>
+    </div>
+
+    <div id="user-tracking-section" class="hidden max-w-md mx-auto p-6 mt-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">My Impact</h2>
+            <button class="back-btn text-xs font-bold text-beacon-gold uppercase">← Back</button>
+        </div>
+        <div class="mb-8 space-y-3">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Messages</label>
+            <div id="inbox-container"></div>
+        </div>
+        <div class="space-y-3">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Track My Reports</label>
+            <div id="my-reports-list" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <div id="leaderboard-section" class="hidden max-w-md mx-auto p-6 mt-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Indore Heroes</h2>
+            <button class="back-btn text-xs font-bold text-beacon-gold uppercase tracking-wider">← Back</button>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="bg-beacon-dark p-4 text-white text-center">
+                <p class="text-xs uppercase tracking-widest font-bold opacity-70">Top Helpers</p>
+            </div>
+            <div id="leaderboard-list" class="divide-y divide-gray-50"></div>
+        </div>
+    </div>
+
+    <div id="mission-section" class="hidden max-w-md mx-auto p-6 mt-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Our Mission</h2>
+            <button class="back-btn text-xs font-bold text-beacon-gold uppercase">← Back</button>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm leading-relaxed">
+            <p class="text-gray-700 font-medium">To ensure no elderly person, orphan, or beggar in Indore is left forgotten.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuFOwPOYS8r8Dzdl2OFw1nTiiPZvofSqA",
+            authDomain: "ali-foundation-bee2d.firebaseapp.com",
+            projectId: "ali-foundation-bee2d",
+            storageBucket: "ali-foundation-bee2d.firebasestorage.app",
+            messagingSenderId: "165901368508",
+            appId: "1:165901368508:web:02d568f2c6e74e615ba4b9"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        // --- AUTHENTICATION ---
+        function signInWithGoogle() { 
+            auth.signInWithPopup(provider).then(() => location.reload()).catch(err => alert(err.message)); 
+        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('profile-setup').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('reputation-display').innerText = `⭐ ${localStorage.getItem('beacon_user_points') || 0} Points`;
+            }
+        });
+
+        // --- GPS LOGIC ---
+        document.getElementById('get-location-btn').addEventListener('click', () => {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('latitude').value = pos.coords.latitude;
+                    document.getElementById('longitude').value = pos.coords.longitude;
+                    document.getElementById('get-location-btn').innerText = "✓ Location Secured";
+                    document.getElementById('get-location-btn').classList.add('bg-green-100', 'text-green-800');
+                });
+            }
+        });
+
+        // --- REPORT SUBMISSION ---
+        document.getElementById('beacon-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Connecting to Cloud...";
+            
+            try {
+                await db.collection("reports").add({
+                    reporterName: user.displayName, 
+                    reporterEmail: user.email,
+                    description: document.getElementById('description').value,
+                    latitude: document.getElementById('latitude').value,
+                    longitude: document.getElementById('longitude').value,
+                    status: "active", 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('beacon-form').classList.add('hidden');
+                document.getElementById('success-message').classList.remove('hidden');
+            } catch (err) { 
+                alert(err.message); 
+                submitBtn.disabled = false; 
+                submitBtn.innerText = "Light The Beacon";
+            }
+        });
+
+        // --- LIVE DASHBOARD (WITH CORRECTED MAP LINK) ---
+        function loadLiveBeacons() {
+            db.collection("reports").where("status", "!=", "resolved").orderBy("status").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                const container = document.getElementById('active-cases-container');
+                container.innerHTML = "";
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `<p class="text-center text-gray-400 py-10 italic">Indore is secure. No active reports.</p>`;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const mapUrl = `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
+                    
+                    const card = `
+                        <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 mb-4 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1 h-full ${data.status === 'active' ? 'bg-red-500' : 'bg-blue-500'}"></div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-[10px] font-bold uppercase ${data.status === 'active' ? 'text-red-500' : 'text-blue-500'}">${data.status}</span>
+                                <span class="text-[10px] text-gray-400">By: ${data.reporterName}</span>
+                            </div>
+                            <p class="text-sm text-gray-800 font-medium mb-4">${data.description}</p>
+                            <div class="flex gap-2">
+                                <a href="${mapUrl}" target="_blank" class="flex-1 bg-gray-100 text-center text-xs py-2.5 rounded-lg font-bold text-gray-700">View Map</a>
+                                ${data.status === 'active' ? 
+                                    `<button onclick="startHelping('${doc.id}')" class="flex-[2] bg-beacon-dark text-white text-xs py-2.5 rounded-lg font-bold">Respond</button>` : 
+                                    `<button onclick="confirmSuccess('${doc.id}')" class="flex-[2] bg-green-600 text-white text-xs py-2.5 rounded-lg font-bold">Mark Helped</button>`}
+                            </div>
+                        </div>`;
+                    container.innerHTML += card;
+                });
+            });
+        }
+
+        async function startHelping(id) { 
+            await db.collection("reports").doc(id).update({ status: "in-progress" }); 
+        }
+        
+        async function confirmSuccess(id) {
+            if (!confirm("Are you sure this person has received help?")) return;
+            await db.collection("reports").doc(id).update({ status: "resolved" });
+            
+            let pts = parseInt(localStorage.getItem('beacon_user_points') || "0") + 50;
+            localStorage.setItem('beacon_user_points', pts);
+            alert("50 Reputation Points earned. Thank you for your service to Indore!");
+            location.reload();
+        }
+
+        // --- MY IMPACT ---
+        function loadMyImpact() {
+            const user = auth.currentUser;
+            db.collection("reports").where("reporterEmail", "==", user.email).orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                const list = document.getElementById('my-reports-list');
+                list.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    list.innerHTML += `<div class="bg-white p-4 rounded-xl border border-gray-100 text-sm"><b class="uppercase text-xs tracking-wider text-gray-500">${data.status}</b><br><span class="font-medium text-gray-800">${data.description}</span></div>`;
+                });
+                document.getElementById('inbox-container').innerHTML = `
+                    <div class="bg-beacon-gold/10 p-4 rounded-xl text-xs text-yellow-800 border border-beacon-gold/20">
+                        <strong class="block mb-1">FOUNDATION SYSTEM</strong>
+                        Thank you, ${user.displayName}. Your actions are building a legacy in Indore.
+                    </div>`;
+            });
+        }
+
+        // --- LEADERBOARD ---
+        function loadLeaderboard() {
+            const list = document.getElementById('leaderboard-list');
+            const myPts = localStorage.getItem('beacon_user_points') || 0;
+            const userName = auth.currentUser ? auth.currentUser.displayName : "Hero";
+
+            list.innerHTML = `
+                <div class="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-beacon-gold">#1</span>
+                        <div>
+                            <p class="font-bold text-gray-900">${userName}</p>
+                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Founder Rank</p>
+                        </div>
+                    </div>
+                    <span class="bg-beacon-gold/10 text-beacon-gold px-3 py-1 rounded-full text-xs font-bold">${myPts} Pts</span>
+                </div>
+            `;
+        }
+
+        // --- SAFE NAVIGATION LOGIC ---
+        // 1. Gather all sections safely
+        const screens = {
+            main: document.getElementById('main-app'),
+            dashboard: document.getElementById('helper-dashboard'),
+            impact: document.getElementById('user-tracking-section'),
+            leaderboard: document.getElementById('leaderboard-section'),
+            mission: document.getElementById('mission-section')
+        };
+        const dropdown = document.getElementById('top-menu-dropdown');
+
+        // 2. Hide everything function
+        function hideAllScreens() {
+            Object.values(screens).forEach(screen => {
+                if (screen) screen.classList.add('hidden');
+            });
+            dropdown.classList.add('hidden');
+        }
+
+        // 3. Menu Toggle
+        document.getElementById('top-menu-btn').addEventListener('click', () => {
+            dropdown.classList.toggle('hidden');
+        });
+
+        // 4. Connect Buttons to Screens
+        document.getElementById('nav-ngo-dashboard').addEventListener('click', () => { hideAllScreens(); screens.dashboard.classList.remove('hidden'); loadLiveBeacons(); });
+        document.getElementById('nav-my-impact').addEventListener('click', () => { hideAllScreens(); screens.impact.classList.remove('hidden'); loadMyImpact(); });
+        document.getElementById('nav-leaderboard').addEventListener('click', () => { hideAllScreens(); screens.leaderboard.classList.remove('hidden'); loadLeaderboard(); });
+        document.getElementById('nav-mission').addEventListener('click', () => { hideAllScreens(); screens.mission.classList.remove('hidden'); });
+
+        // 5. Connect all Back Buttons
+        document.querySelectorAll('.back-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                hideAllScreens();
+                screens.main.classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
