@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Beacon - Ali Foundation Indore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ali Foundation - The Beacon</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,142 +15,258 @@
             theme: {
                 extend: {
                     colors: {
-                        beacon: { gold: '#D4AF37', dark: '#1A1A24', light: '#F8F9FA' }
+                        'beacon-dark': '#1A1A24',
+                        'beacon-gold': '#D4AF37',
+                        'beacon-light': '#F8F9FA',
                     }
                 }
             }
         }
     </script>
+    <style>
+        .hamburger-line { @apply w-6 h-0.5 bg-beacon-dark rounded; }
+        .screen { @apply hidden min-h-screen bg-beacon-light; }
+        .screen.active { @apply block; }
+        .report-card { transition: all 0.3s ease; }
+        .report-card.active { @apply border-4 border-red-500 shadow-2xl; }
+        .report-card.in-progress { @apply border-4 border-blue-500 shadow-2xl; }
+    </style>
 </head>
-<body class="bg-beacon-light text-gray-800 min-h-screen font-sans pb-20">
+<body class="bg-gradient-to-br from-beacon-light to-white font-sans antialiased">
+    
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-md z-50 shadow-lg border-b border-beacon-dark/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-beacon-gold to-yellow-500 rounded-2xl shadow-lg flex items-center justify-center">
+                        <span class="text-beacon-dark font-bold text-lg">☀️</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-beacon-dark to-gray-800 bg-clip-text text-transparent">Ali Foundation</h1>
+                        <p class="text-xs text-beacon-dark/70 font-medium">The Beacon</p>
+                    </div>
+                </div>
 
-    <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-50">
-        <div class="max-w-md mx-auto flex justify-between items-center relative">
-            <div class="flex items-center gap-2">
-                <h1 class="text-xl font-bold tracking-wide text-beacon-dark">THE BEACON</h1>
-                <span class="text-[10px] bg-beacon-gold/20 text-yellow-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Live</span>
+                <div class="hidden md:flex items-center px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-full text-green-700 text-sm font-semibold">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                    Live
+                </div>
+
+                <div class="flex items-center md:hidden">
+                    <button id="menu-toggle" class="p-2 rounded-xl hover:bg-beacon-light transition-all">
+                        <div class="hamburger-line mb-1.5"></div>
+                        <div class="hamburger-line mb-1.5"></div>
+                        <div class="hamburger-line"></div>
+                    </button>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-6">
+                    <button id="nav-dashboard" class="nav-btn px-4 py-2 rounded-xl text-beacon-dark font-semibold hover:bg-beacon-light transition-all">NGO Dashboard</button>
+                    <button id="nav-impact" class="nav-btn px-4 py-2 rounded-xl text-beacon-dark font-semibold hover:bg-beacon-light transition-all">My Impact</button>
+                    <button id="nav-leaderboard" class="nav-btn px-4 py-2 rounded-xl text-beacon-dark font-semibold hover:bg-beacon-light transition-all">Leaderboard</button>
+                    <button id="nav-mission" class="nav-btn px-4 py-2 rounded-xl text-beacon-dark font-semibold hover:bg-beacon-light transition-all">Our Mission</button>
+                    <button id="nav-signout" class="px-4 py-2 bg-gradient-to-r from-beacon-gold to-yellow-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all">Sign Out</button>
+                </div>
             </div>
-            <button id="top-menu-btn" class="text-gray-600 p-2 -mr-2 focus:outline-none">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-            
-            <div id="top-menu-dropdown" class="hidden absolute top-full right-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden z-50">
-                <div class="p-5 border-b border-gray-50 bg-gray-50/50">
-                    <p class="text-sm font-bold text-gray-800">My Profile</p>
-                    <p id="reputation-display" class="text-xs text-beacon-gold font-bold mt-1 tracking-wide">⭐ 0 Reputation Points</p>
+
+            <div id="mobile-menu" class="md:hidden hidden pb-4 space-y-2 border-t border-beacon-dark/10 pt-4">
+                <div class="flex items-center justify-between px-2 mb-4">
+                    <span id="mobile-rep-points" class="text-lg font-bold text-beacon-dark">0 pts</span>
+                    <span class="text-sm text-beacon-dark/70">Founder Rank</span>
                 </div>
-                <div class="py-2">
-                    <button id="nav-ngo-dashboard" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        NGO Dashboard
-                    </button>
-                    <button id="nav-my-impact" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        My Impact & Inbox
-                    </button>
-                    <button id="nav-leaderboard" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        Leaderboard
-                    </button>
-                    <button id="nav-mission" class="w-full text-left px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        Our Mission
-                    </button>
-                    <button onclick="auth.signOut().then(() => location.reload())" class="w-full text-left px-5 py-3 text-sm text-red-500 border-t border-gray-50 mt-2 flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                        Sign Out
-                    </button>
-                </div>
+                <button id="mobile-nav-dashboard" class="nav-btn-mobile w-full text-left px-4 py-3 rounded-xl hover:bg-beacon-light transition-all">NGO Dashboard</button>
+                <button id="mobile-nav-impact" class="nav-btn-mobile w-full text-left px-4 py-3 rounded-xl hover:bg-beacon-light transition-all">My Impact</button>
+                <button id="mobile-nav-leaderboard" class="nav-btn-mobile w-full text-left px-4 py-3 rounded-xl hover:bg-beacon-light transition-all">Leaderboard</button>
+                <button id="mobile-nav-mission" class="nav-btn-mobile w-full text-left px-4 py-3 rounded-xl hover:bg-beacon-light transition-all">Our Mission</button>
+                <button id="mobile-nav-signout" class="w-full px-4 py-3 bg-gradient-to-r from-beacon-gold to-yellow-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all">Sign Out</button>
             </div>
         </div>
     </nav>
 
-    <div id="profile-setup" class="max-w-md mx-auto p-6 mt-4 text-center">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Ali Foundation</h2>
-        <p class="text-sm text-gray-500 mb-8 italic">Building a legacy for the forgotten.</p>
-        <button onclick="signInWithGoogle()" class="w-full bg-white text-gray-700 font-bold py-4 rounded-2xl shadow-md border border-gray-200 flex items-center justify-center gap-3 active:scale-95 transition-transform">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa_g_logo.png" class="w-5 h-5">
-            Sign in with Google
-        </button>
-    </div>
-
-    <main id="main-app" class="hidden max-w-md mx-auto p-6 mt-4">
-        <h2 class="text-2xl font-bold mb-6 text-beacon-dark">Report a Need</h2>
-        <form id="beacon-form" class="space-y-6">
-            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-3">1. Photo Evidence</label>
-                <input type="file" id="media-upload" accept="image/*" capture="environment" class="hidden">
-                <button type="button" onclick="document.getElementById('media-upload').click()" class="w-full border-2 border-dashed border-gray-200 rounded-xl p-6 text-center text-sm font-bold text-gray-500">
-                    Tap to Capture Photo
+    <div id="app-container" class="pt-20">
+        
+        <div id="screen-auth" class="screen active flex items-center justify-center min-h-screen p-4">
+            <div class="max-w-md w-full bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 text-center border border-white/50">
+                <div class="w-24 h-24 bg-gradient-to-r from-beacon-gold to-yellow-500 rounded-3xl mx-auto mb-8 shadow-xl flex items-center justify-center">
+                    <span class="text-3xl">☀️</span>
+                </div>
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-beacon-dark via-gray-800 to-beacon-dark bg-clip-text text-transparent mb-4">Welcome to The Beacon</h1>
+                <p class="text-beacon-dark/70 text-lg mb-8 leading-relaxed">Log in to start recording deeds and changing lives in Indore.</p>
+                <button id="btn-google-signin" class="w-full bg-gradient-to-r from-beacon-dark to-gray-800 text-white font-semibold py-4 px-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center space-x-3 text-lg">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    <span>Sign in with Google</span>
                 </button>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-3">2. Exact Location</label>
-                <button type="button" id="get-location-btn" class="w-full bg-gray-50 text-gray-700 font-bold py-3 rounded-xl">Auto-Detect Pin</button>
-                <input type="hidden" id="latitude">
-                <input type="hidden" id="longitude">
+        </div>
+
+        <div id="screen-report" class="screen p-4 sm:p-8">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-beacon-dark via-gray-800 to-beacon-dark bg-clip-text text-transparent mb-4">Report a Deed</h1>
+                    <p class="text-xl text-beacon-dark/70 max-w-2xl mx-auto">Every deed builds the foundation of a better city.</p>
+                </div>
+
+                <form id="report-form" class="space-y-8">
+                    
+                    <div class="bg-white/50 backdrop-blur-xl rounded-3xl p-8 border border-white/30 shadow-xl">
+                        <label class="block text-lg font-semibold text-beacon-dark mb-4">📸 Scene Photo</label>
+                        <div id="photo-preview" class="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center border-2 border-dashed border-gray-300 mb-4 text-gray-500">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-gray-300 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <p>Tap to take photo</p>
+                            </div>
+                        </div>
+                        <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
+                        <button type="button" id="photo-btn" class="w-full bg-gradient-to-r from-beacon-gold to-yellow-500 text-white font-semibold py-4 px-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center space-x-3 text-lg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H3a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span>Take Photo</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white/50 backdrop-blur-xl rounded-3xl p-8 border border-white/30 shadow-xl">
+                        <label class="block text-lg font-semibold text-beacon-dark mb-4">📍 Exact Location</label>
+                        <div id="location-preview" class="w-full h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center border-2 border-dashed border-blue-300 mb-4 text-blue-600 font-medium">
+                            Ready to locate...
+                        </div>
+                        <input type="hidden" id="lat-input">
+                        <input type="hidden" id="lng-input">
+                        <button type="button" id="location-btn" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-4 px-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center space-x-3 text-lg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span>Drop Pin (Required)</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white/50 backdrop-blur-xl rounded-3xl p-8 border border-white/30 shadow-xl">
+                        <label class="block text-lg font-semibold text-beacon-dark mb-4">✍️ Field Notes</label>
+                        <textarea id="details-textarea" rows="5" class="w-full p-6 border-2 border-gray-200 rounded-2xl focus:border-beacon-gold focus:ring-2 focus:ring-beacon-gold/20 focus:outline-none text-lg resize-vertical transition-all" placeholder="What deed needs doing? Be specific about the situation so NGOs know what to bring."></textarea>
+                    </div>
+
+                    <button type="submit" id="submit-report" class="w-full bg-gradient-to-r from-beacon-dark to-gray-800 text-white font-bold py-6 px-8 rounded-3xl shadow-2xl hover:shadow-3xl transition-all text-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                        🚀 Submit Deed to the Network
+                    </button>
+                </form>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-3">3. Details</label>
-                <textarea id="description" rows="3" placeholder="Describe the situation..." class="w-full p-3 bg-gray-50 outline-none rounded-lg resize-none"></textarea>
+        </div>
+
+        <div id="screen-dashboard" class="screen p-4 sm:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-beacon-dark via-gray-800 to-beacon-dark bg-clip-text text-transparent mb-4">NGO Dashboard</h1>
+                    <p class="text-xl text-beacon-dark/70">Deeds pending action across the city</p>
+                    <div class="mt-4 inline-flex items-center px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-full text-green-700 text-sm font-semibold">
+                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                        <span id="live-count">0</span> Active Deeds
+                    </div>
+                </div>
+                <div id="reports-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
             </div>
-            <button type="submit" id="submit-btn" class="w-full bg-beacon-dark text-white font-bold py-4 rounded-xl shadow-lg">Light The Beacon</button>
-        </form>
-        <div id="success-message" class="hidden text-center py-10">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Beacon Activated</h3>
-            <button onclick="location.reload()" class="mt-4 text-beacon-gold font-bold">New Report</button>
         </div>
-    </main>
 
-    <div id="helper-dashboard" class="hidden max-w-md mx-auto p-6 mt-4">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Active Beacons</h2>
-            <button class="back-btn text-xs font-bold text-beacon-gold uppercase">← Back</button>
-        </div>
-        <div id="active-cases-container" class="space-y-4"></div>
-    </div>
+        <div id="screen-impact" class="screen p-4 sm:p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-beacon-gold to-yellow-500 bg-clip-text text-transparent mb-4">My Impact</h1>
+                    <p class="text-xl text-beacon-dark/70 mb-8">A record of your actions</p>
+                </div>
 
-    <div id="user-tracking-section" class="hidden max-w-md mx-auto p-6 mt-4">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">My Impact</h2>
-            <button class="back-btn text-xs font-bold text-beacon-gold uppercase">← Back</button>
-        </div>
-        <div class="mb-8 space-y-3">
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Messages</label>
-            <div id="inbox-container"></div>
-        </div>
-        <div class="space-y-3">
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Track My Reports</label>
-            <div id="my-reports-list" class="space-y-4"></div>
-        </div>
-    </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-beacon-dark mb-6">Deed History</h2>
+                        <div id="user-reports" class="space-y-4"></div>
+                    </div>
 
-    <div id="leaderboard-section" class="hidden max-w-md mx-auto p-6 mt-4">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Indore Heroes</h2>
-            <button class="back-btn text-xs font-bold text-beacon-gold uppercase tracking-wider">← Back</button>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="bg-beacon-dark p-4 text-white text-center">
-                <p class="text-xs uppercase tracking-widest font-bold opacity-70">Top Helpers</p>
+                    <div class="bg-gradient-to-br from-beacon-gold/10 to-yellow-500/10 border border-beacon-gold/20 rounded-3xl p-8 lg:p-12 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-24 h-24 bg-gradient-to-r from-beacon-gold to-yellow-500 rounded-3xl mx-auto mb-8 shadow-xl flex items-center justify-center">
+                                <span class="text-3xl">❤️</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-beacon-dark mb-4">The Work Continues</h3>
+                            <p class="text-lg text-beacon-dark/80 leading-relaxed">Your actions are creating a ripple effect. Keep reporting, keep helping.</p>
+                            <div class="mt-6 p-4 bg-white/50 rounded-2xl text-left">
+                                <p class="font-semibold text-beacon-dark text-sm">System Message:</p>
+                                <p class="text-sm text-beacon-dark/70 mt-1">Thank you for validating another beacon. The local NGOs have been notified of your latest upload.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="leaderboard-list" class="divide-y divide-gray-50"></div>
         </div>
-    </div>
 
-    <div id="mission-section" class="hidden max-w-md mx-auto p-6 mt-4">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Our Mission</h2>
-            <button class="back-btn text-xs font-bold text-beacon-gold uppercase">← Back</button>
+        <div id="screen-leaderboard" class="screen p-4 sm:p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-beacon-gold to-yellow-500 bg-clip-text text-transparent mb-4">City Standings</h1>
+                    <p class="text-xl text-beacon-dark/70 mb-8">Top contributors lighting up the map</p>
+                    <div class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-beacon-gold to-yellow-500 text-white font-bold rounded-2xl shadow-2xl">
+                        🥇 Founder Tier
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/40 shadow-2xl">
+                        <h3 class="text-2xl font-bold text-beacon-dark mb-6 flex items-center">
+                            <span class="w-10 h-10 bg-gradient-to-r from-beacon-gold to-yellow-500 rounded-2xl flex items-center justify-center text-white font-bold mr-4 text-xl">1</span>
+                            You
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-beacon-gold/10 to-yellow-500/10 rounded-2xl">
+                                <span class="font-semibold text-beacon-dark">Reputation</span>
+                                <span id="leaderboard-points" class="text-3xl font-bold text-beacon-gold">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/50 backdrop-blur-xl rounded-3xl p-8 border border-white/30 shadow-xl flex flex-col justify-center text-center">
+                        <p class="text-gray-400 italic mb-2">More users syncing...</p>
+                        <p class="text-xs text-gray-500">Global leaderboard activates when more volunteers join the network.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm leading-relaxed">
-            <p class="text-gray-700 font-medium">To ensure no elderly person, orphan, or beggar in Indore is left forgotten.</p>
+
+        <div id="screen-mission" class="screen p-4 sm:p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-beacon-dark via-gray-800 to-beacon-dark bg-clip-text text-transparent mb-4">The Ali Foundation</h1>
+                    <p class="text-xl text-beacon-dark/70 mb-8">Observation is the first step to intervention.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <div class="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/40 shadow-2xl">
+                            <h3 class="text-3xl font-bold text-beacon-dark mb-6">Our Protocol</h3>
+                            <p class="text-lg text-beacon-dark/80 leading-relaxed mb-6">
+                                We believe no one should be invisible. Whether it’s an elder left behind, an orphan in the rough, or a stranger needing a meal, the Ali Foundation acts as the digital nervous system for the city. 
+                                We collect the data, map the needs, and deploy the help.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-beacon-gold/20 to-yellow-500/20 border-4 border-beacon-gold/30 rounded-3xl p-8 shadow-2xl">
+                            <blockquote class="text-2xl font-semibold text-beacon-dark italic mb-6">
+                                "A deed reported is a life acknowledged."
+                            </blockquote>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/50 backdrop-blur-xl rounded-3xl p-12 border border-white/30 shadow-2xl text-center">
+                        <div class="w-32 h-32 bg-gradient-to-r from-beacon-gold to-yellow-500 rounded-full mx-auto mb-8 shadow-2xl flex items-center justify-center">
+                            <span class="text-4xl">🔬</span>
+                        </div>
+                        <h3 class="text-3xl font-bold text-beacon-dark mb-6">The Methodology</h3>
+                        <p class="text-lg text-beacon-dark/80 mb-8 leading-relaxed">
+                            Analyze the environment. Document the coordinates. Trigger the response network.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- FIREBASE CONFIGURATION ---
-        const firebaseConfig = {
+     const firebaseConfig = {
             apiKey: "AIzaSyCuFOwPOYS8r8Dzdl2OFw1nTiiPZvofSqA",
             authDomain: "ali-foundation-bee2d.firebaseapp.com",
             projectId: "ali-foundation-bee2d",
@@ -159,187 +275,275 @@
             appId: "1:165901368508:web:02d568f2c6e74e615ba4b9"
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const provider = new firebase.auth.GoogleAuthProvider();
 
-        // --- AUTHENTICATION ---
-        function signInWithGoogle() { 
-            auth.signInWithPopup(provider).then(() => location.reload()).catch(err => alert(err.message)); 
+        let currentUser = null;
+        let reputationPoints = 0;
+
+        // basic jquery-style selector to save typing
+        const $ = selector => document.querySelector(selector);
+
+        const screens = {
+            auth: '#screen-auth',
+            report: '#screen-report',
+            dashboard: '#screen-dashboard',
+            impact: '#screen-impact',
+            leaderboard: '#screen-leaderboard',
+            mission: '#screen-mission'
+        };
+
+        function showScreen(screenKey) {
+            Object.values(screens).forEach(screen => {
+                if ($(screen)) $(screen).classList.remove('active');
+            });
+            if ($(screens[screenKey])) $(screens[screenKey]).classList.add('active');
         }
 
+        function updateRepPoints() {
+            reputationPoints = parseInt(localStorage.getItem('repPoints') || '0');
+            if ($('#mobile-rep-points')) $('#mobile-rep-points').textContent = `${reputationPoints} pts`;
+            if ($('#leaderboard-points')) $('#leaderboard-points').textContent = reputationPoints;
+        }
+
+        // auth handling
+        $('#btn-google-signin')?.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                console.error('Login failed:', error);
+                alert('Sign in failed. Make sure your local server is running.');
+            });
+        });
+
+        // BUG FIX 1: only load data after we confirm the user is logged in
         auth.onAuthStateChanged(user => {
+            currentUser = user;
             if (user) {
-                document.getElementById('profile-setup').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('reputation-display').innerText = `⭐ ${localStorage.getItem('beacon_user_points') || 0} Points`;
+                showScreen('report');
+                updateRepPoints();
+                initDashboard(); 
+                initMyImpact();  
+            } else {
+                showScreen('auth');
             }
         });
 
-        // --- GPS LOGIC ---
-        document.getElementById('get-location-btn').addEventListener('click', () => {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    document.getElementById('latitude').value = pos.coords.latitude;
-                    document.getElementById('longitude').value = pos.coords.longitude;
-                    document.getElementById('get-location-btn').innerText = "✓ Location Secured";
-                    document.getElementById('get-location-btn').classList.add('bg-green-100', 'text-green-800');
-                });
-            }
-        });
+        function signOut() {
+            auth.signOut().then(() => {
+                localStorage.removeItem('repPoints');
+            });
+        }
 
-        // --- REPORT SUBMISSION ---
-        document.getElementById('beacon-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const user = auth.currentUser;
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Connecting to Cloud...";
+        // setup click events for the menu
+        function initNavigation() {
+            ['dashboard', 'impact', 'leaderboard', 'mission'].forEach(screen => {
+                $(`#nav-${screen}`)?.addEventListener('click', () => showScreen(screen));
+            });
+            $('#nav-signout')?.addEventListener('click', signOut);
+
+            $('#menu-toggle')?.addEventListener('click', () => {
+                $('#mobile-menu').classList.toggle('hidden');
+            });
             
-            try {
-                await db.collection("reports").add({
-                    reporterName: user.displayName, 
-                    reporterEmail: user.email,
-                    description: document.getElementById('description').value,
-                    latitude: document.getElementById('latitude').value,
-                    longitude: document.getElementById('longitude').value,
-                    status: "active", 
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            ['dashboard', 'impact', 'leaderboard', 'mission'].forEach(screen => {
+                $(`#mobile-nav-${screen}`)?.addEventListener('click', () => {
+                    showScreen(screen);
+                    $('#mobile-menu').classList.add('hidden');
                 });
-                document.getElementById('beacon-form').classList.add('hidden');
-                document.getElementById('success-message').classList.remove('hidden');
-            } catch (err) { 
-                alert(err.message); 
-                submitBtn.disabled = false; 
-                submitBtn.innerText = "Light The Beacon";
-            }
-        });
+            });
+            $('#mobile-nav-signout')?.addEventListener('click', () => {
+                signOut();
+                $('#mobile-menu').classList.add('hidden');
+            });
+        }
 
-        // --- LIVE DASHBOARD (WITH CORRECTED MAP LINK) ---
-        function loadLiveBeacons() {
-            db.collection("reports").where("status", "!=", "resolved").orderBy("status").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                const container = document.getElementById('active-cases-container');
-                container.innerHTML = "";
+        // handle the deed reporting form
+        function initReportForm() {
+            const photoInput = $('#photo-input');
+            const photoPreview = $('#photo-preview');
+            const photoBtn = $('#photo-btn');
+
+            photoBtn?.addEventListener('click', () => photoInput?.click());
+            
+            // basic image preview logic
+            photoInput?.addEventListener('change', e => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        photoPreview.innerHTML = `<img src="${e.target.result}" class="w-full h-64 object-cover rounded-2xl">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            const locationBtn = $('#location-btn');
+            const locationPreview = $('#location-preview');
+            const latInput = $('#lat-input');
+            const lngInput = $('#lng-input');
+
+            locationBtn?.addEventListener('click', () => {
+                if (!navigator.geolocation) return alert('GPS not supported on this device');
                 
-                if (snapshot.empty) {
-                    container.innerHTML = `<p class="text-center text-gray-400 py-10 italic">Indore is secure. No active reports.</p>`;
-                    return;
+                locationBtn.innerHTML = 'Locating...';
+                navigator.geolocation.getCurrentPosition(pos => {
+                    latInput.value = pos.coords.latitude;
+                    lngInput.value = pos.coords.longitude;
+
+                    locationPreview.innerHTML = `
+                        <div class="text-green-600 font-bold">
+                            ✅ Coordinates Locked
+                            <div class="text-sm mt-2">${latInput.value}, ${lngInput.value}</div>
+                        </div>
+                    `;
+                    locationBtn.innerHTML = '✅ Pin Dropped <span class="ml-2">✓</span>';
+                    locationBtn.classList.add('bg-green-500');
+                }, err => alert('Location access denied. Please enable GPS.'));
+            });
+
+            $('#report-form')?.addEventListener('submit', async e => {
+                e.preventDefault();
+                const lat = latInput.value;
+                const lng = lngInput.value;
+                const description = $('#details-textarea').value;
+
+                if (!lat || !lng || !description.trim()) {
+                    return alert('Please drop a pin and write the field notes before submitting.');
                 }
 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const mapUrl = `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
+                try {
+                    await db.collection('reports').add({
+                        reporterName: currentUser.displayName,
+                        reporterEmail: currentUser.email,
+                        description: description,
+                        latitude: parseFloat(lat),
+                        longitude: parseFloat(lng),
+                        status: 'active',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                     
-                    const card = `
-                        <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 mb-4 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-1 h-full ${data.status === 'active' ? 'bg-red-500' : 'bg-blue-500'}"></div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-[10px] font-bold uppercase ${data.status === 'active' ? 'text-red-500' : 'text-blue-500'}">${data.status}</span>
-                                <span class="text-[10px] text-gray-400">By: ${data.reporterName}</span>
+                    alert('Deed logged to the network. Thank you.');
+                    $('#report-form').reset();
+                    locationPreview.innerHTML = 'Ready to locate...';
+                    locationBtn.innerHTML = 'Drop Pin (Required)';
+                    locationBtn.classList.remove('bg-green-500');
+                    
+                    // BUG FIX 4: Properly reset the photo box
+                    photoPreview.innerHTML = `
+                        <div class="text-center text-gray-500">
+                            <div class="w-16 h-16 bg-gray-300 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             </div>
-                            <p class="text-sm text-gray-800 font-medium mb-4">${data.description}</p>
-                            <div class="flex gap-2">
-                                <a href="${mapUrl}" target="_blank" class="flex-1 bg-gray-100 text-center text-xs py-2.5 rounded-lg font-bold text-gray-700">View Map</a>
-                                ${data.status === 'active' ? 
-                                    `<button onclick="startHelping('${doc.id}')" class="flex-[2] bg-beacon-dark text-white text-xs py-2.5 rounded-lg font-bold">Respond</button>` : 
-                                    `<button onclick="confirmSuccess('${doc.id}')" class="flex-[2] bg-green-600 text-white text-xs py-2.5 rounded-lg font-bold">Mark Helped</button>`}
-                            </div>
+                            <p>Tap to take photo</p>
                         </div>`;
-                    container.innerHTML += card;
-                });
+                        
+                } catch (error) {
+                    console.error('Upload failed:', error);
+                    alert('Failed to connect to the cloud.');
+                }
             });
         }
 
-        async function startHelping(id) { 
-            await db.collection("reports").doc(id).update({ status: "in-progress" }); 
-        }
-        
-        async function confirmSuccess(id) {
-            if (!confirm("Are you sure this person has received help?")) return;
-            await db.collection("reports").doc(id).update({ status: "resolved" });
-            
-            let pts = parseInt(localStorage.getItem('beacon_user_points') || "0") + 50;
-            localStorage.setItem('beacon_user_points', pts);
-            alert("50 Reputation Points earned. Thank you for your service to Indore!");
-            location.reload();
-        }
+        // populate the NGO screen with live data
+        function initDashboard() {
+            const reportsList = $('#reports-list');
+            db.collection('reports')
+                .where('status', 'in', ['active', 'in-progress'])
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    reportsList.innerHTML = '';
+                    $('#live-count').textContent = snapshot.size;
 
-        // --- MY IMPACT ---
-        function loadMyImpact() {
-            const user = auth.currentUser;
-            db.collection("reports").where("reporterEmail", "==", user.email).orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                const list = document.getElementById('my-reports-list');
-                list.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    list.innerHTML += `<div class="bg-white p-4 rounded-xl border border-gray-100 text-sm"><b class="uppercase text-xs tracking-wider text-gray-500">${data.status}</b><br><span class="font-medium text-gray-800">${data.description}</span></div>`;
+                    snapshot.forEach(doc => {
+                        const report = doc.data();
+                        
+                      
+                       const mapLink = `http://googleusercontent.com/maps.google.com/?q=${report.latitude},${report.longitude}`;
+                        
+                        const div = document.createElement('div');
+                        div.className = `report-card bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border-2 border-white/50 report-card ${report.status}`;
+                        div.innerHTML = `
+                            <div class="flex items-start justify-between mb-6">
+                                <div class="px-3 py-1 rounded-full text-xs font-bold ${
+                                    report.status === 'active' ? 'bg-red-500/20 text-red-700 border border-red-500/30' : 
+                                    'bg-blue-500/20 text-blue-700 border border-blue-500/30'
+                                }">
+                                    ${report.status.toUpperCase()}
+                                </div>
+                                <a href="${mapLink}" target="_blank" class="p-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-xl transition-all">
+                                    📍 Map
+                                </a>
+                            </div>
+                            <h3 class="text-xl font-bold text-beacon-dark mb-3">${report.reporterName}</h3>
+                            <p class="text-beacon-dark/80 mb-4 leading-relaxed">${report.description}</p>
+                            <div class="flex items-center justify-between text-sm text-beacon-dark/60 mb-6">
+                                <span>${report.timestamp?.toDate ? report.timestamp.toDate().toLocaleDateString() : 'Just now'}</span>
+                            </div>
+                            <div class="flex space-x-3">
+                                ${report.status === 'active' ? 
+                                    `<button onclick="respondToReport('${doc.id}')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg">Respond</button>` : ''}
+                                <button onclick="markHelped('${doc.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg">Deed Done</button>
+                            </div>
+                        `;
+                        reportsList.appendChild(div);
+                    });
                 });
-                document.getElementById('inbox-container').innerHTML = `
-                    <div class="bg-beacon-gold/10 p-4 rounded-xl text-xs text-yellow-800 border border-beacon-gold/20">
-                        <strong class="block mb-1">FOUNDATION SYSTEM</strong>
-                        Thank you, ${user.displayName}. Your actions are building a legacy in Indore.
-                    </div>`;
-            });
         }
 
-        // --- LEADERBOARD ---
-        function loadLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
-            const myPts = localStorage.getItem('beacon_user_points') || 0;
-            const userName = auth.currentUser ? auth.currentUser.displayName : "Hero";
-
-            list.innerHTML = `
-                <div class="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center gap-4">
-                        <span class="text-lg font-black text-beacon-gold">#1</span>
-                        <div>
-                            <p class="font-bold text-gray-900">${userName}</p>
-                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Founder Rank</p>
-                        </div>
-                    </div>
-                    <span class="bg-beacon-gold/10 text-beacon-gold px-3 py-1 rounded-full text-xs font-bold">${myPts} Pts</span>
-                </div>
-            `;
-        }
-
-        // --- SAFE NAVIGATION LOGIC ---
-        // 1. Gather all sections safely
-        const screens = {
-            main: document.getElementById('main-app'),
-            dashboard: document.getElementById('helper-dashboard'),
-            impact: document.getElementById('user-tracking-section'),
-            leaderboard: document.getElementById('leaderboard-section'),
-            mission: document.getElementById('mission-section')
+        window.respondToReport = async (docId) => {
+            await db.collection('reports').doc(docId).update({ status: 'in-progress' });
         };
-        const dropdown = document.getElementById('top-menu-dropdown');
 
-        // 2. Hide everything function
-        function hideAllScreens() {
-            Object.values(screens).forEach(screen => {
-                if (screen) screen.classList.add('hidden');
+        window.markHelped = async (docId) => {
+            await db.collection('reports').doc(docId).update({ 
+                status: 'resolved',
+                resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            dropdown.classList.add('hidden');
+            reputationPoints += 50;
+            localStorage.setItem('repPoints', reputationPoints.toString());
+            updateRepPoints();
+            alert('Deed resolved. +50 points added to your foundation standing.');
+        };
+
+        function initMyImpact() {
+            const userReports = $('#user-reports');
+            db.collection('reports')
+                .where('reporterEmail', '==', currentUser.email)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    userReports.innerHTML = '';
+                    if (snapshot.empty) {
+                        userReports.innerHTML = `<div class="text-center py-12 text-gray-400 italic">No deeds recorded yet.</div>`;
+                        return;
+                    }
+                    snapshot.forEach(doc => {
+                        const report = doc.data();
+                        const mapLink = `https://maps.google.com/?q=${report.latitude},${report.longitude}`;
+                        
+                        const card = document.createElement('div');
+                        card.className = 'bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-white/40 shadow-sm mb-3';
+                        card.innerHTML = `
+                            <div class="flex items-start justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-500/20 text-gray-700">${report.status}</span>
+                            </div>
+                            <p class="text-beacon-dark/80 mb-4">${report.description}</p>
+                            <div class="flex items-center justify-between text-sm text-beacon-dark/60">
+                                <a href="${mapLink}" target="_blank" class="text-blue-600 hover:underline flex items-center">Verify Location</a>
+                                <span>${report.timestamp?.toDate ? new Date(report.timestamp.toDate()).toLocaleDateString() : 'Recent'}</span>
+                            </div>
+                        `;
+                        userReports.appendChild(card);
+                    });
+                });
         }
 
-        // 3. Menu Toggle
-        document.getElementById('top-menu-btn').addEventListener('click', () => {
-            dropdown.classList.toggle('hidden');
+        // kick off the app
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            initReportForm();
         });
 
-        // 4. Connect Buttons to Screens
-        document.getElementById('nav-ngo-dashboard').addEventListener('click', () => { hideAllScreens(); screens.dashboard.classList.remove('hidden'); loadLiveBeacons(); });
-        document.getElementById('nav-my-impact').addEventListener('click', () => { hideAllScreens(); screens.impact.classList.remove('hidden'); loadMyImpact(); });
-        document.getElementById('nav-leaderboard').addEventListener('click', () => { hideAllScreens(); screens.leaderboard.classList.remove('hidden'); loadLeaderboard(); });
-        document.getElementById('nav-mission').addEventListener('click', () => { hideAllScreens(); screens.mission.classList.remove('hidden'); });
-
-        // 5. Connect all Back Buttons
-        document.querySelectorAll('.back-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                hideAllScreens();
-                screens.main.classList.remove('hidden');
-            });
-        });
     </script>
 </body>
 </html>
